@@ -1,0 +1,45 @@
+# __author__ = 'trananhdung'
+# Docker version 18.06.1-ce, build e68fc7a
+
+version: '2'
+services:
+  postgres_10:
+    image: postgres:10
+    ports:
+      - 5433:5432
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    restart: always
+
+  wkhtmltopdf:
+    build: ./odoo_docker/wkhtmltopdf
+    volumes:
+      - /tmp:/tmp
+
+  odoo_11:
+    build: ./odoo_docker/odoo
+    volumes:
+      - ./requirements.txt:/requirements.txt
+      - ./addons:/addons
+      - ./extra_addons:/extra_addons
+      - ./odoo-server.log:/odoo/odoo-server.log
+      - ./odoo-server.conf:/odoo/odoo-server.conf
+      - /tmp:/tmp
+    links:
+      - "postgres_10:postgres_10"
+      - "wkhtmltopdf:wkhtmltopdf"
+    environment:
+      - DB_HOST=postgres_10
+    restart: always
+    depends_on:
+      - "postgres_10"
+      - "wkhtmltopdf"
+
+  nginx:
+    build: ./odoo_docker/nginx
+    ports:
+      - 8069:8069
+    links:
+      - "odoo_11:odoo_11"
+    environment:
+      - ODOO_SERVER=odoo_11
