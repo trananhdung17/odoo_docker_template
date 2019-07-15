@@ -20,3 +20,5 @@ RUN chown odoo:odoo -R /odoo
 RUN curl https://bootstrap.pypa.io/get-pip.py | python3
 RUN python3 -m pip install -r /odoo/requirements.txt
 RUN python3 -m pip install phonenumbers
+
+CMD ['python3', '/odoo/odoo-bin']

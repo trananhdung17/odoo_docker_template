@@ -3,7 +3,7 @@
 
 FROM trananhdung17/odoo:11.0
 
-RUN apt-get install net-tools wget
+RUN apt-get update && apt-get install net-tools wget
 
 COPY ./keys/id_ecdsa /home/odoo/.ssh/id_ecdsa
 COPY ./keys/id_ecdsa.pub /home/odoo/.ssh/id_ecdsa.pub
@@ -12,7 +12,7 @@ COPY ./wkhtmltopdf/wkhtmltopdf.sh /usr/bin/wkhtmltopdf
 COPY ./entrypoint.sh /entrypoint.sh
 
 RUN chown odoo:odoo -R /home/odoo/.ssh
-RUN chmod og-r /home/odoo/.ssh/id_ecdsa
+RUN chmod og-rw /home/odoo/.ssh/id_ecdsa
 RUN chmod uog+x /usr/bin/wkhtmltopdf
 
 ENTRYPOINT ["/entrypoint.sh"]

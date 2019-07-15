@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 
 install_requirements(){
+    echo "Installing project's requirements..."
     docker-compose exec -u root odoo_11 python3 -m pip install -r /requirements.txt
     echo 'Restarting odoo service...'
     docker-compose stop odoo_11
     docker-compose start odoo_11
+    echo 'Install requirements done.'
 }
 
 init_odoo_db(){
+    echo 'Initializing Odoo DB...'
     docker-compose exec -u root postgres_10 psql -U postgres -c "create role odoo with login createdb password 'odoo'"
     docker-compose exec -u root postgres_10 psql -U odoo -d template1 -c "create database odoo"
+    echo 'Init DB done.'
 }
 
 case "$1" in
@@ -20,22 +24,18 @@ case "$1" in
         echo 'Building images...'
         docker-compose build
         echo 'Creating containers...'
-        docker-compose create
-        docker-compose start
-        echo 'Init Odoo DB'
+        docker-compose up -d
         init_odoo_db
-        echo 'Installing project requirements...'
         install_requirements
-        echo 'Done.'
+        echo 'INIT PROJECT DONE.'
         ;;
 
     initdb)
-        echo 'Init Odoo DB'
         init_odoo_db
-        echo 'Done.'
         ;;
 
     build | rebuild)
+        docker-compose stop
         docker-compose rm
         docker-compose build
         ;;
@@ -51,7 +51,7 @@ case "$1" in
             nginx)
                 docker-compose "$1" nginx
                 ;;
-            wk)
+            wk | wkhtmltopdf)
                 docker-compose "$1" wkhtmltopdf
                 ;;
             all)
@@ -63,7 +63,7 @@ case "$1" in
             esac
         ;;
     up)
-        docker-compose up
+        docker-compose up -d
         ;;
         
     status)
@@ -92,15 +92,31 @@ case "$1" in
         esac
         ;;
 
+    update)
+        case "$2" in
+            odoo)
+                docker-compose exec odoo_11 /entrypoint.sh update
+                ;;
+            requirements)
+                echo 'Updating project requirements...'
+                install_requirements
+                echo 'Done.'
+                ;;
+            *)
+                echo 'Usage: ./manage.sh update <options>'
+                echo '    options:'
+                echo '        - odoo            Update odoo base source code'
+                echo "        - requirements    Update project's requirements defined in requirements.txt"
+                ;;
+            esac
+            ;;
     remove | rm)
         docker-compose stop
         docker-compose rm
         ;;
 
-    update)
-        echo 'Updating project requirements...'
-        install_requirements
-        echo 'Done.'
+    clean)
+        docker-compose down
         ;;
 
     *)

@@ -30,7 +30,7 @@ Syntax: `./manage.sh <command> [service_name]`
 
 Commands:
 
- - init:                   Initialize all services
+ - init:                   Initialize all services, this command consist of initdb
  
  - initdb:                 Initialize DB for odoo service
  
@@ -53,13 +53,18 @@ Commands:
                            
  - remove | rm:            Stop and remove all serivces
  
- - update:                 Update requirements for odoo service
+ - update [option]:        Update requirements for odoo service
+                           Options: - odoo          Update Odoo source code by pull source code in git
+                                    - requirements  Update project's requirements that define in requirements.txt
+ 
+ - clean                   Stop and remove all project's container & network. 
+                           But still keep log file (odoo-server.log) and database in ./pg_data
  
  - help:                   Get help on a command
 
 Services:
 
- - odoo
+ - odoo     
  - postgres
  - nginx
  - wk | wkhtmltopdf

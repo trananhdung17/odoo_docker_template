@@ -1,7 +1,7 @@
 # __author__ = 'trananhdung'
 # Docker version 18.06.1-ce, build e68fc7a
 
-version: '2'
+version: '3'
 services:
   postgres_10:
     image: postgres:10
@@ -10,11 +10,15 @@ services:
     volumes:
       - ./pg_data:/var/lib/postgresql/data
     restart: always
+    networks:
+      - default
 
   wkhtmltopdf:
     build: ./odoo_docker/wkhtmltopdf
     volumes:
       - /tmp:/tmp
+    networks:
+      - default
 
   odoo_11:
     build: ./odoo_docker/odoo
@@ -34,6 +38,8 @@ services:
     depends_on:
       - "postgres_10"
       - "wkhtmltopdf"
+    networks:
+      - default
 
   nginx:
     build: ./odoo_docker/nginx
@@ -43,3 +49,11 @@ services:
       - "odoo_11:odoo_11"
     environment:
       - ODOO_SERVER=odoo_11
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450

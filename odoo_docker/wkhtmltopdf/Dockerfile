@@ -5,8 +5,10 @@ FROM centos:7.2.1511
 
 RUN yum install -y libpng libjpeg openssl icu libX11 libXext libXrender xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi openssh-server
 RUN rpm -ivh https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.1/wkhtmltox-0.12.1_linux-centos7-amd64.rpm
-# TODO: copy keys instead of generate keys by `ssh-keygen -A`
-RUN ssh-keygen -A
+
+COPY ./keys/keys.tar.gz /etc/ssh/
+RUN tar -xzvf /etc/ssh/keys.tar.gz -C /etc/ssh/
+
 RUN mkdir -p /root/.ssh
 COPY ./keys/authorized_keys /root/.ssh/authorized_keys
 RUN chown root:root -R /root/.ssh/
