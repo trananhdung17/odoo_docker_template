@@ -22,7 +22,8 @@ Then build project on docker
 $ cd <project-name>
 $ ./manage.sh init
 ```
-
+**Notes:** After run all services, we need to change value of parameter `web.base.url` in Odoo system parameters
+to `http://odoo_11:8069`, then create new parameter named `web.base.url.freeze` with value is `True`
 ## Manage
 Use `manage.sh` to manage docker containers
 
