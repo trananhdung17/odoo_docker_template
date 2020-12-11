@@ -2,11 +2,12 @@
 # Docker version 18.06.1-ce, build e68fc7a
 # Please pull image from tranhdung17/odoo:12.0 intead of build this Docker file
 
-FROM ubuntu:18.04
+FROM debian:stable
 
 # Install dependencies
 RUN apt-get update
-RUN apt-get install -y git curl libssl1.0-dev nodejs-dev node-gyp npm python3-dev libxml2-dev libxslt1-dev libsasl2-dev libldap2-dev
+RUN apt-get -y upgrade
+RUN apt-get install -y git curl nodejs npm wkhtmltopdf
 RUN npm install -g less
 
 # Get odoo source code
@@ -16,9 +17,13 @@ RUN git clone --single-branch -b 12.0 https://github.com/odoo/odoo.git
 RUN useradd odoo -m
 RUN chown odoo:odoo -R /odoo
 
+# Install libs:
+RUN apt-get install -y libssl-dev node-gyp npm python3-dev libxml2-dev libxslt1-dev libsasl2-dev libldap2-dev libpq-dev
+
 # Install python packages
 RUN curl https://bootstrap.pypa.io/get-pip.py | python3
 RUN python3 -m pip install -r /odoo/requirements.txt
 RUN python3 -m pip install phonenumbers
 
-CMD ['python3', '/odoo/odoo-bin']
+USER odoo
+CMD 'python3' '/odoo/odoo-bin'

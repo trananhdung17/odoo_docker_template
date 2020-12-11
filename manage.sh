@@ -2,36 +2,25 @@
 
 install_requirements(){
     echo "Installing project's requirements..."
-    docker-compose exec -u root odoo_11 python3 -m pip install -r /requirements.txt
+    docker-compose exec -u root odoo_12 python3 -m pip install -r /odoo/requirements.txt
     echo 'Restarting odoo service...'
-    docker-compose stop odoo_11
-    docker-compose start odoo_11
+    docker-compose stop odoo_12
+    docker-compose start odoo_12
     echo 'Install requirements done.'
-}
-
-init_odoo_db(){
-    echo 'Initializing Odoo DB...'
-    docker-compose exec -u root postgres_10 psql -U postgres -c "create role odoo with login createdb password 'odoo'"
-    docker-compose exec -u root postgres_10 psql -U odoo -d template1 -c "create database odoo"
-    echo 'Init DB done.'
 }
 
 case "$1" in
 
     init)
         echo '[logs]' > odoo-server.log
+        cat odoo-server.conf.template > odoo-server.conf
         chmod uog+rw odoo-server.log
         echo 'Building images...'
         docker-compose build
         echo 'Creating containers...'
         docker-compose up -d
-        init_odoo_db
-        install_requirements
+#        install_requirements
         echo 'INIT PROJECT DONE.'
-        ;;
-
-    initdb)
-        init_odoo_db
         ;;
 
     build | rebuild)
@@ -43,7 +32,7 @@ case "$1" in
     start | stop | restart)
         case "$2" in
             odoo)
-                docker-compose "$1" odoo_11
+                docker-compose "$1" odoo_12
                 ;;
             postgres)
                 docker-compose "$1" postgres_10
@@ -62,6 +51,7 @@ case "$1" in
                 ;;
             esac
         ;;
+
     up)
         docker-compose up -d
         ;;
@@ -75,7 +65,7 @@ case "$1" in
     attach)
         case "$2" in
             odoo)
-                docker-compose exec -u root odoo_11 /bin/bash
+                docker-compose exec -u root odoo_12 /bin/bash
                 ;;
             postgres)
                 docker-compose exec -u root postgres_10 /bin/bash
@@ -95,7 +85,7 @@ case "$1" in
     update)
         case "$2" in
             odoo)
-                docker-compose exec odoo_11 /entrypoint.sh update
+                docker-compose exec odoo_12 /entrypoint.sh update
                 ;;
             requirements)
                 echo 'Updating project requirements...'

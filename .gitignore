@@ -44,4 +44,6 @@ MANIFEST
 
 # log file
 *.log
+# config file
+*.conf
 

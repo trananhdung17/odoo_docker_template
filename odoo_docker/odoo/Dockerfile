@@ -1,21 +1,11 @@
 # __author__ = 'trananhdung'
 # Docker version 18.06.1-ce, build e68fc7a
 
-FROM trananhdung17/odoo:11.0
+FROM trananhdung17/debian-odoo:12.0
 
-RUN apt-get update && apt-get install net-tools wget
+# COPY ./entrypoint.sh /entrypoint.sh
 
-COPY ./keys/id_ecdsa /home/odoo/.ssh/id_ecdsa
-COPY ./keys/id_ecdsa.pub /home/odoo/.ssh/id_ecdsa.pub
-COPY ./keys/known_hosts /home/odoo/.ssh/known_hosts
-COPY ./wkhtmltopdf/wkhtmltopdf.sh /usr/bin/wkhtmltopdf
-COPY ./entrypoint.sh /entrypoint.sh
-
-RUN chown odoo:odoo -R /home/odoo/.ssh
-RUN chmod og-rw /home/odoo/.ssh/id_ecdsa
-RUN chmod uog+x /usr/bin/wkhtmltopdf
-
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT "/entrypoint.sh"
 
 USER odoo
-CMD ["odoo"]
+CMD 'python3' '/odoo/odoo-bin' '--config=/odoo/odoo-server.conf'

@@ -10,18 +10,17 @@ services:
     volumes:
       - ./pg_data:/var/lib/postgresql/data
     restart: always
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=odoo
+      - PGDATA=/var/lib/postgresql/data
     networks:
       - default
 
-  wkhtmltopdf:
-    build: ./odoo_docker/wkhtmltopdf
-    volumes:
-      - /tmp:/tmp
-    networks:
-      - default
-
-  odoo_11:
+  odoo_12:
     build: ./odoo_docker/odoo
+#    image: trananhdung17/debian-odoo:12.0
     volumes:
       - ./requirements.txt:/requirements.txt
       - ./addons:/addons
@@ -31,13 +30,11 @@ services:
       - /tmp:/tmp
     links:
       - "postgres_10:postgres_10"
-      - "wkhtmltopdf:wkhtmltopdf"
     environment:
       - DB_HOST=postgres_10
     restart: always
     depends_on:
       - "postgres_10"
-      - "wkhtmltopdf"
     networks:
       - default
 
@@ -46,11 +43,13 @@ services:
     ports:
       - 8069:8069
     links:
-      - "odoo_11:odoo_11"
+      - "odoo_12:odoo_12"
     environment:
-      - ODOO_SERVER=odoo_11
+      - ODOO_SERVER=odoo_12
     networks:
       - default
+    depends_on:
+      - odoo_12
 
 networks:
   default:
